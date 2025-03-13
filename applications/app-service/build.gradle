@@ -1,0 +1,17 @@
+apply plugin: 'org.springframework.boot'
+
+dependencies {
+	testImplementation 'org.springframework:spring-web'
+	implementation project(':api-rest')
+	testImplementation 'com.fasterxml.jackson.core:jackson-databind'
+	testImplementation 'com.tngtech.archunit:archunit:1.3.0'
+    implementation project(':model')
+    implementation project(':usecase')
+    implementation 'org.springframework.boot:spring-boot-starter'
+    runtimeOnly('org.springframework.boot:spring-boot-devtools')
+}
+
+task explodedJar(type: Copy) {
+    with jar
+    into "${buildDir}/exploded"
+}
