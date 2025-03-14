@@ -1,6 +1,8 @@
 package co.com.guardians.api;
 import co.com.guardians.usecase.clue.ClueUseCase;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +25,11 @@ public class ClueRest {
     }
 
     @PostMapping
-    public String analyze(@RequestBody JsonNode bodyNode) {
-//      return clueUseCase.containsArtifactClue(bodyNode.get("manuscript").asText()).getClue();
+    public boolean analyze(@RequestBody JsonNode bodyNode) {
+        ObjectMapper mapper = new ObjectMapper();
+        String[] manuscriptArray = mapper.convertValue(bodyNode.get("manuscript"), new TypeReference<String[]>() {});
+        return clueUseCase.containsArtifactClue(manuscriptArray);
 
-        return "Hello World";
+        //return "Hello World";
     }
 }
