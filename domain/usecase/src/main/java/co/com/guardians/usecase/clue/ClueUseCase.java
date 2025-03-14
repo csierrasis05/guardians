@@ -1,92 +1,144 @@
 package co.com.guardians.usecase.clue;
 
-//import co.com.guardians.model.clue.gateways.ClueRepository;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+
 
 @RequiredArgsConstructor
 public class ClueUseCase {
 
-    //    private final ClueRepository clueRepository;
+    public static void procesarArrayDeCadenas(String[] array) {
+        //Validacion Array no vacio
+        if (array == null || array.length < 4) {
+            System.out.println("false");
+            //return;
+        }
+        // Validar Horizontal
+        if (validateStringArray(array)) {
+            System.out.println("true HORIZONTAL");
+            //return;
+        } else {
+            System.out.println("false HORIZONTAL");
+        }
 
-    public boolean containsArtifactClue(String[] manuscript) {
-        char[][] matrix = toMatrix(manuscript);
-        printMatrix(matrix);
-        char[][] transmatrix = transposeMatrix(matrix);
-        printMatrix(transmatrix);
-        String diagonal = getDiagonal(matrix);
-        System.out.println(diagonal);
-        validate(matrix);
-        //validate(diagonal);
+        // Validar Vertical
+        if (validateVertical(array)) {
+            System.out.println("true VERTICAL");
+            //return;
+        } else {
+            System.out.println("false VERTICAL");
+        }
+
+        //Validate Diagonal
+        if (validateAllDiagonals(array, array.length)) {
+            System.out.println("true DIAGONAL");
+        } else {
+            System.out.println("false DIAGONAL");
+        }
+    }
+    private static boolean validateStringArray(String[] array) {
+        int[] cont = new int[128]; // Asumiendo caracteres ASCII
+
+        for (String s : array) {
+            // Limpiar Contador
+            Arrays.fill(cont, 0);
+
+            for (int i = 0; i < s.length(); i++) {
+                char c = s.charAt(i);
+                cont[c]++;
+                if (cont[c] == 4) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
-    private char[][] toMatrix(String[] manuscript) {
-        // Crear una matrix de caracteres con el tamaño del arreglo y la longitud de la cadena más larga
-        int maxLength = Arrays.stream(manuscript)
-                .mapToInt(String::length)
-                .max()
-                .orElse(0);
-
-        return Arrays.stream(manuscript)
-                .map(s -> {
-                    char[] row = new char[maxLength];
-                    System.arraycopy(s.toCharArray(), 0, row, 0, s.length());
-                    return row;
-                })
-                .toArray(char[][]::new);
-    }
-
-    private char[][] transposeMatrix(char[][] matrix) {
-        int rows = matrix.length;
-        int cols = matrix[0].length;
-
-        return IntStream.range(0, cols)
-                .mapToObj(col -> IntStream.range(0, rows)
-                        .mapToObj(row -> matrix[row][col])
-                        .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-                        .toString().toCharArray())
-                .toArray(char[][]::new);
-    }
-
-    private boolean validate(char[][] manuscriptMatrix) {
-        return Arrays.stream(manuscriptMatrix)
-                .anyMatch(row -> {
-                    long match = coincidence(row);
-                    if (match >= 3) {
-                        System.out.println("iguales");
-                        return true;
-                    } else {
-                        System.out.println("diferentes");
-                        return false;
-                    }
-                });
-    }
-
-    private static long coincidence(char[] row) {
-        return IntStream.range(0, row.length - 1)
-                .filter(i -> row[i] == row[i + 1])
-                .count();
-    }
-
-    private String getDiagonal(char[][] manuscriptMatrix) {
-        return IntStream.range(0, Math.min(manuscriptMatrix.length, manuscriptMatrix[0].length))
-                .mapToObj(i -> String.valueOf(manuscriptMatrix[i][i]))
-                .collect(Collectors.joining());
-    }
-
-    private  void printMatrix(char[][] matrix) {
-        for (char[] row : matrix) {
-            for (char c : row) {
-                System.out.print(c + " ");
+    private static boolean validateVertical(String[] array) {
+           // Recorrer Array
+        for (int i = 0; ; i++) {
+            //Validar cantidad de elementos disponibles
+            if(array.length - i < 4){
+                return false;
             }
-            System.out.println();
+            char currentChar = '\0';
+            int consecutiveCount = 0;
+            boolean positionValid = false;
+
+            // Comparar los caracteres en la misma posición en todos los strings
+            for (String word : array) {
+                if (word == null || i >= word.length()) {
+                    continue; // Ignorar strings más cortos
+                }
+
+                positionValid = true;
+                char character = word.charAt(i);
+
+                if (character == currentChar) {
+                    consecutiveCount++;
+                    if (consecutiveCount == 4) {
+                        return true;
+                    }
+                } else {
+                    currentChar = character;
+                    consecutiveCount = 1;
+                }
+            }
+            // Si no hay strings válidos en esta posición, detener la búsqueda
+            if (!positionValid) {
+                break;
+            }
         }
+
+        return false; // No se encontraron 4 coincidencias consecutivas
     }
 
+    //VERSION 2
+    private static boolean validateAllDiagonals(String[] array, int n) {
+        // Verificar diagonales principales y secundarias
+        for (int k = 0; k < 2 * n - 1; k++) {
+            if (validateDiagonal(array, n, k, true) || validateDiagonal(array, n, k, false)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //VERSION 2
+    private static boolean validateDiagonal(String[] array, int n, int diagonal, boolean isPrimary) {
+        int[] cont = new int[128]; // Asumiendo caracteres ASCII
+        int x = Math.max(0, diagonal - n + 1);
+        int y = isPrimary ? Math.max(0, n - 1 - diagonal) : Math.min(diagonal, n - 1);
+
+        while (x < n && y < n && y >= 0) {
+            char c = array[x].charAt(y);
+            cont[c]++;
+            if (cont[c] == 4) {
+                return true;
+            }
+
+            x++;
+            if (isPrimary) {
+                y++;
+            } else {
+                y--;
+            }
+        }
+        return false;
+    }
+    public static void main(String[] args) {
+//        String[] array = {"abcd", "efgh", "ijkl", "mnop"};
+//        procesarArrayDeCadenas(array);  // Salida esperada: false
+
+        String[] arrayv = {"telly", "tyllu", "hyllo",  "tyzzjujknbu", "hyllo"};
+        procesarArrayDeCadenas(arrayv);
+
+       System.out.println("-------------------------------------------------");
+       System.out.println("EJEMPLO DIAGONAL");
+        String[] arrayConDiagonal = {"RTPGQW","XDOLWE","NASWLR","REWSTL","EGSISE","BRINDR"};
+
+        procesarArrayDeCadenas(arrayConDiagonal);  // Salida esperada: true
+
+    }
 }
