@@ -7,18 +7,35 @@ import co.com.guardians.model.manuscriptinventory.gateways.ManuscriptInventoryGa
 import org.reactivecommons.utils.ObjectMapper;
 import org.springframework.stereotype.Repository;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
+import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
+import software.amazon.awssdk.enhanced.dynamodb.model.PageIterable;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryEnhancedRequest;
 import software.amazon.awssdk.enhanced.dynamodb.model.ScanEnhancedRequest;
+import software.amazon.awssdk.services.dynamodb.model.ScanRequest;
+import software.amazon.awssdk.services.dynamodb.model.Select;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 public class ManuscriptInventoryAdapter extends TemplateAdapterOperations<ManuscriptInventory, String, ManuscriptInventoryEntity>  implements ManuscriptInventoryGateway {
 
-    public ManuscriptInventoryAdapter(DynamoDbEnhancedClient connectionFactory,  ObjectMapper mapper) {
-        super(connectionFactory, mapper, d -> mapper.map(d,  ManuscriptInventory.class), "manuscriptInventory");
+    private final DynamoDbTable<ManuscriptInventoryEntity> table;
+
+    public ManuscriptInventoryAdapter(DynamoDbEnhancedClient connectionFactory, ObjectMapper mapper) {
+        super(connectionFactory, mapper, d -> mapper.map(d, ManuscriptInventory.class), "manuscriptInventory");
+        this.table = connectionFactory.table("manuscriptInventory", TableSchema.fromBean(ManuscriptInventoryEntity.class));
+    }
+
+    public List<ManuscriptInventory> getAllManuscripts() {
+        return table.scan(ScanEnhancedRequest.builder().build())
+                .items()
+                .stream()
+                .map(entity -> new ManuscriptInventory(entity.getManuscript(), entity.getHiddenClue()))
+                .collect(Collectors.toList());
     }
 
     public List<ManuscriptInventory> getEntityByPartitionKey(String partitionKey) {

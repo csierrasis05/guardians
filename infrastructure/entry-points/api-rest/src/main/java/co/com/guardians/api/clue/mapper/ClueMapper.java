@@ -1,7 +1,7 @@
-package co.com.guardians.api.mapper;
+package co.com.guardians.api.clue.mapper;
 
-import co.com.guardians.api.dto.ClueDto;
-import co.com.guardians.api.dto.ClueDtoResp;
+import co.com.guardians.api.clue.dto.ClueDto;
+import co.com.guardians.api.clue.dto.ClueDtoResp;
 import co.com.guardians.model.clue.Clue;
 import co.com.guardians.model.clue.ClueResp;
 import org.mapstruct.Mapper;

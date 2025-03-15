@@ -5,8 +5,6 @@ import co.com.guardians.model.manuscriptinventory.ManuscriptInventory;
 import co.com.guardians.model.manuscriptinventory.gateways.ManuscriptInventoryGateway;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Arrays;
-
 
 @RequiredArgsConstructor
 public class ClueUseCase {
@@ -16,23 +14,21 @@ public class ClueUseCase {
     private final ManuscriptInventoryGateway manuscriptInventoryGateway;
 
     public ClueResp containsArtifactClue(String[] manuscript) {
+        if (manuscript == null || manuscript.length < 4) {
+            return ClueResp.builder().clue(false).build();
+        }
 
         String ms = String.join("", manuscript);
-        ManuscriptInventory  manus = ManuscriptInventory.builder()
+        ManuscriptInventory manus = ManuscriptInventory.builder()
                 .manuscript(ms)
                 .hiddenClue(falseValue)
                 .build();
 
         ManuscriptInventory manuscriptInventory = manuscriptInventoryGateway.save(manus);
-        if (manuscript == null || manuscript.length < 4) {
-            var b = Boolean.parseBoolean(manuscriptInventory.getHiddenClue());
-            return ClueResp.builder().clue(b)
-                    .build();
-        }
 
-        if(validateStringArray(manuscript) || validateVertical(manuscript) || validateAllDiagonals(manuscript, manuscript.length)){
+        if(validateStringArray(manuscript) || validateVertical(manuscript) || validateAllDiagonals(manuscript, manuscript.length)) {
             return ClueResp.builder().clue(Boolean.parseBoolean(manuscriptInventoryGateway.save(ManuscriptInventory.builder()
-                            .manuscript(String.join("", manuscript))
+                            .manuscript(ms)
                             .hiddenClue(trueValue)
                             .build()
                     ).getHiddenClue()))
@@ -40,49 +36,24 @@ public class ClueUseCase {
         }
 
         return ClueResp.builder().clue(Boolean.parseBoolean(manuscriptInventoryGateway.save(ManuscriptInventory.builder()
-                        .manuscript(String.join("", manuscript))
+                        .manuscript(ms)
                         .hiddenClue(falseValue)
                         .build()
                 ).getHiddenClue()))
                 .build();
     }
+
     private static boolean validateStringArray(String[] array) {
-        int[] cont = new int[128]; // Asumiendo caracteres ASCII
-
         for (String s : array) {
-            // Limpiar Contador
-            Arrays.fill(cont, 0);
-
-            for (int i = 0; i < s.length(); i++) {
-                char c = s.charAt(i);
-                cont[c]++;
-                if (cont[c] == 4) {
-                    return true;
-                }
+            if (s == null || s.isEmpty()) {
+                continue; // Ignorar strings vacíos o nulos
             }
-        }
-        return false;
-    }
 
-    private static boolean validateVertical(String[] array) {
-           // Recorrer Array
-        for (int i = 0; ; i++) {
-            //Validar cantidad de elementos disponibles
-            if(array.length - i < 4){
-                return false;
-            }
-            char currentChar = '\0';
-            int consecutiveCount = 0;
-            boolean positionValid = false;
+            char currentChar = s.charAt(0);
+            int consecutiveCount = 1;
 
-            // Comparar los caracteres en la misma posición en todos los strings
-            for (String word : array) {
-                if (word == null || i >= word.length()) {
-                    continue; // Ignorar strings más cortos
-                }
-
-                positionValid = true;
-                char character = word.charAt(i);
+            for (int i = 1; i < s.length(); i++) {
+                char character = s.charAt(i);
 
                 if (character == currentChar) {
                     consecutiveCount++;
@@ -94,17 +65,37 @@ public class ClueUseCase {
                     consecutiveCount = 1;
                 }
             }
-            // Si no hay strings válidos en esta posición, detener la búsqueda
-            if (!positionValid) {
-                break;
+        }
+        return false;
+    }
+
+    private static boolean validateVertical(String[] array) {
+        int maxLength = array.length;
+        for (int i = 0; i < maxLength; i++) {
+            char currentChar = '\0';
+            int consecutiveCount = 0;
+
+            for (String word : array) {
+                if (word == null || i >= word.length()) {
+                    break; // Evita el acceso fuera de rango
+                }
+
+                char character = word.charAt(i);
+                if (character == currentChar) {
+                    consecutiveCount++;
+                    if (consecutiveCount == 4) {
+                        return true;
+                    }
+                } else {
+                    currentChar = character;
+                    consecutiveCount = 1;
+                }
             }
         }
-
-        return false; // No se encontraron 4 coincidencias consecutivas
+        return false;
     }
 
     private static boolean validateAllDiagonals(String[] manuscript, int n) {
-        // Verificar diagonales principales y secundarias
         for (int k = 0; k < 2 * n - 1; k++) {
             if (validateDiagonal(manuscript, n, k, true) || validateDiagonal(manuscript, n, k, false)) {
                 return true;
@@ -119,6 +110,10 @@ public class ClueUseCase {
         int y = principal ? Math.max(0, size - 1 - diagonal) : Math.min(diagonal, size - 1);
 
         while (x < size && y < size && y >= 0) {
+            if (x >= manuscript.length || y >= manuscript[x].length() || y < 0) {
+                break; // Evita accesos fuera de rango
+            }
+
             char c = manuscript[x].charAt(y);
             cont[c]++;
             if (cont[c] == 4) {
