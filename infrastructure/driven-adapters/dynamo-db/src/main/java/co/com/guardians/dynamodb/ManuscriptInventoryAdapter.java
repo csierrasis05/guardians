@@ -7,10 +7,13 @@ import co.com.guardians.model.manuscriptinventory.gateways.ManuscriptInventoryGa
 import org.reactivecommons.utils.ObjectMapper;
 import org.springframework.stereotype.Repository;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
+import software.amazon.awssdk.enhanced.dynamodb.model.PageIterable;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryEnhancedRequest;
 import software.amazon.awssdk.enhanced.dynamodb.model.ScanEnhancedRequest;
+import software.amazon.awssdk.services.dynamodb.model.Select;
 
 import java.util.List;
 
@@ -19,6 +22,17 @@ public class ManuscriptInventoryAdapter extends TemplateAdapterOperations<Manusc
 
     public ManuscriptInventoryAdapter(DynamoDbEnhancedClient connectionFactory,  ObjectMapper mapper) {
         super(connectionFactory, mapper, d -> mapper.map(d,  ManuscriptInventory.class), "manuscriptInventory");
+    }
+    public long countItemsInTable(DynamoDbTable<ManuscriptInventoryEntity> table) {
+        ScanEnhancedRequest scanRequest = ScanEnhancedRequest.builder()
+                .consistentRead(false)
+                .select(Select.COUNT)
+                .build();
+
+        PageIterable<ManuscriptInventoryEntity> response = table.scan(scanRequest);
+        return response.stream()
+                .mapToLong(page -> page.items().size())
+                .sum();
     }
 
     public List<ManuscriptInventory> getEntityByPartitionKey(String partitionKey) {

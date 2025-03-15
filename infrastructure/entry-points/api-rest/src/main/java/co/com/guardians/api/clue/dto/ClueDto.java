@@ -1,4 +1,4 @@
-package co.com.guardians.api.dto;
+package co.com.guardians.api.clue.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;

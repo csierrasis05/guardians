@@ -1,13 +1,11 @@
-package co.com.guardians.api;
-import co.com.guardians.api.dto.ClueDtoResp;
-import co.com.guardians.api.mapper.ClueMapper;
+package co.com.guardians.api.clue;
+import co.com.guardians.api.clue.dto.ClueDtoResp;
+import co.com.guardians.api.clue.mapper.ClueMapper;
 import co.com.guardians.usecase.clue.ClueUseCase;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
