@@ -9,6 +9,5 @@ import org.mapstruct.factory.Mappers;
 @Mapper
 public interface StatisticsMapper {
     StatisticsMapper MAPPER = Mappers.getMapper(StatisticsMapper.class);
-
     StatisticsDtoResp toEntity(StatisticsResp statisticsResp);
 }

@@ -1,4 +1,5 @@
 package co.com.guardians.api.clue;
+import co.com.guardians.api.clue.dto.ClueDto;
 import co.com.guardians.api.clue.dto.ClueDtoResp;
 import co.com.guardians.api.clue.mapper.ClueMapper;
 import co.com.guardians.usecase.clue.ClueUseCase;
@@ -6,7 +7,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,25 +17,14 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ClueRest {
 
-
+    private final ObjectMapper mapper = new ObjectMapper();
     private final ClueUseCase clueUseCase;
 
-
-
-    @GetMapping
-    public String commandName() {
-//      return useCase.doAction();
-        return "Hello World";
-    }
-
     @PostMapping
-    public ClueDtoResp analyze(@RequestBody JsonNode bodyNode) {
-        ObjectMapper mapper = new ObjectMapper();
-        String[] manuscriptArray = mapper.convertValue(bodyNode.get("manuscript"), new TypeReference<String[]>() {});
-//        return ClueDtoResp.builder()
-//                        .clue(clueUseCase.containsArtifactClue(manuscriptArray).isClue())
-//                        .build();
+    public ResponseEntity<ClueDtoResp> analyze(@RequestBody JsonNode bodyNode) {
+        ClueDto bodyValue = mapper.convertValue(bodyNode, ClueDto.class);
+        ClueDtoResp response = ClueMapper.MAPPER.toEntity(clueUseCase.containsArtifactClue(bodyValue.getManuscript()));
 
-        return ClueMapper.MAPPER.toEntity(clueUseCase.containsArtifactClue(manuscriptArray));
+        return ResponseEntity.status(response.isClue() ? HttpStatus.OK : HttpStatus.FORBIDDEN).body(response);
     }
 }
