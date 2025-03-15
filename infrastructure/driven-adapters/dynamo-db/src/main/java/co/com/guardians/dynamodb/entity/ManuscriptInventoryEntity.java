@@ -24,7 +24,7 @@ public class ManuscriptInventoryEntity {
     public String getManuscript() { return manuscript; }
 
     @DynamoDbAttribute("hiddenClue")
-    public String getHiddenCluel() {
+    public String getHiddenClue() {
         return hiddenClue;
     }
 }

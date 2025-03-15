@@ -17,13 +17,16 @@ public class ClueUseCase {
 
     public ClueResp containsArtifactClue(String[] manuscript) {
 
-        ManuscriptInventory manuscriptInventory = manuscriptInventoryGateway.save(ManuscriptInventory.builder()
-                .manuscript(String.join("", manuscript))
+        String ms = String.join("", manuscript);
+        ManuscriptInventory  manus = ManuscriptInventory.builder()
+                .manuscript(ms)
                 .hiddenClue(falseValue)
-                .build()
-        );
+                .build();
+
+        ManuscriptInventory manuscriptInventory = manuscriptInventoryGateway.save(manus);
         if (manuscript == null || manuscript.length < 4) {
-            return ClueResp.builder().clue(Boolean.parseBoolean(manuscriptInventory.getHiddenClue()))
+            var b = Boolean.parseBoolean(manuscriptInventory.getHiddenClue());
+            return ClueResp.builder().clue(b)
                     .build();
         }
 

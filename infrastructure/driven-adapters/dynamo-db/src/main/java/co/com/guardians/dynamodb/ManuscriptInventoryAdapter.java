@@ -10,6 +10,7 @@ import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryEnhancedRequest;
+import software.amazon.awssdk.enhanced.dynamodb.model.ScanEnhancedRequest;
 
 import java.util.List;
 
@@ -20,20 +21,31 @@ public class ManuscriptInventoryAdapter extends TemplateAdapterOperations<Manusc
         super(connectionFactory, mapper, d -> mapper.map(d,  ManuscriptInventory.class), "manuscriptInventory");
     }
 
-//    public List< ManuscriptInventory> getEntityBySomeKeys(String partitionKey, String sortKey) {
-//        QueryEnhancedRequest queryExpression = generateQueryExpression(partitionKey, sortKey);
-//        return query(queryExpression);
-//    }
+    public List<ManuscriptInventory> getEntityByPartitionKey(String partitionKey) {
+        QueryEnhancedRequest queryExpression = generateQueryExpression(partitionKey);
+        return query(queryExpression);
+    }
+
+    private QueryEnhancedRequest generateQueryExpression(String partitionKey) {
+        return QueryEnhancedRequest.builder()
+                .queryConditional(QueryConditional.keyEqualTo(Key.builder().partitionValue(partitionKey).build()))
+                .build();
+    }
+
+    public List< ManuscriptInventory> getEntityBySomeKeys(String partitionKey, String sortKey) {
+        QueryEnhancedRequest queryExpression = generateQueryExpression(partitionKey, sortKey);
+        return query(queryExpression);
+    }
 //
 //    public List< ManuscriptInventory> getEntityBySomeKeysByIndex(String partitionKey, String sortKey) {
 //        QueryEnhancedRequest queryExpression = generateQueryExpression(partitionKey, sortKey);
 //        return queryByIndex(queryExpression, "secondary_index" /*index is optional if you define in constructor*/);
 //    }
-//
-//    private QueryEnhancedRequest generateQueryExpression(String partitionKey, String sortKey) {
-//        return QueryEnhancedRequest.builder()
-//                .queryConditional(QueryConditional.keyEqualTo(Key.builder().partitionValue(partitionKey).build()))
-//                .queryConditional(QueryConditional.sortGreaterThanOrEqualTo(Key.builder().sortValue(sortKey).build()))
-//                .build();
-//    }
+
+    private QueryEnhancedRequest generateQueryExpression(String partitionKey, String sortKey) {
+        return QueryEnhancedRequest.builder()
+                .queryConditional(QueryConditional.keyEqualTo(Key.builder().partitionValue(partitionKey).build()))
+                .queryConditional(QueryConditional.sortGreaterThanOrEqualTo(Key.builder().sortValue(sortKey).build()))
+                .build();
+    }
 }
