@@ -21,10 +21,10 @@ public class ManuscriptInventoryEntity {
 
     @DynamoDbPartitionKey
     @DynamoDbAttribute("manuscript")
-    public String getIdentifier() { return manuscript; }
+    public String getManuscript() { return manuscript; }
 
     @DynamoDbAttribute("hiddenClue")
-    public String getChannel() {
+    public String getHiddenCluel() {
         return hiddenClue;
     }
 }
