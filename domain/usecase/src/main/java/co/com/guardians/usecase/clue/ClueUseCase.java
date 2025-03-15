@@ -1,5 +1,6 @@
 package co.com.guardians.usecase.clue;
 
+import co.com.guardians.model.clue.ClueResp;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
@@ -7,35 +8,17 @@ import java.util.Arrays;
 
 @RequiredArgsConstructor
 public class ClueUseCase {
+    private final boolean trueValue = true;
+    private final boolean falseValue = false;
 
-    public static void procesarArrayDeCadenas(String[] array) {
-        //Validacion Array no vacio
-        if (array == null || array.length < 4) {
-            System.out.println("false");
-            //return;
+    public ClueResp containsArtifactClue(String[] manuscript) {
+        if (manuscript == null || manuscript.length < 4) {
+            return ClueResp.builder().clue(falseValue).build();
         }
-        // Validar Horizontal
-        if (validateStringArray(array)) {
-            System.out.println("true HORIZONTAL");
-            //return;
-        } else {
-            System.out.println("false HORIZONTAL");
+        if(validateStringArray(manuscript) || validateVertical(manuscript) || validateAllDiagonals(manuscript, manuscript.length)){
+            return ClueResp.builder().clue(trueValue).build();
         }
-
-        // Validar Vertical
-        if (validateVertical(array)) {
-            System.out.println("true VERTICAL");
-            //return;
-        } else {
-            System.out.println("false VERTICAL");
-        }
-
-        //Validate Diagonal
-        if (validateAllDiagonals(array, array.length)) {
-            System.out.println("true DIAGONAL");
-        } else {
-            System.out.println("false DIAGONAL");
-        }
+        return ClueResp.builder().clue(falseValue).build();
     }
     private static boolean validateStringArray(String[] array) {
         int[] cont = new int[128]; // Asumiendo caracteres ASCII
@@ -94,51 +77,34 @@ public class ClueUseCase {
         return false; // No se encontraron 4 coincidencias consecutivas
     }
 
-    //VERSION 2
-    private static boolean validateAllDiagonals(String[] array, int n) {
+    private static boolean validateAllDiagonals(String[] manuscript, int n) {
         // Verificar diagonales principales y secundarias
         for (int k = 0; k < 2 * n - 1; k++) {
-            if (validateDiagonal(array, n, k, true) || validateDiagonal(array, n, k, false)) {
+            if (validateDiagonal(manuscript, n, k, true) || validateDiagonal(manuscript, n, k, false)) {
                 return true;
             }
         }
         return false;
     }
 
-    //VERSION 2
-    private static boolean validateDiagonal(String[] array, int n, int diagonal, boolean isPrimary) {
-        int[] cont = new int[128]; // Asumiendo caracteres ASCII
-        int x = Math.max(0, diagonal - n + 1);
-        int y = isPrimary ? Math.max(0, n - 1 - diagonal) : Math.min(diagonal, n - 1);
+    private static boolean validateDiagonal(String[] manuscript, int size, int diagonal, boolean principal) {
+        int[] cont = new int[128];
+        int x = Math.max(0, diagonal - size + 1);
+        int y = principal ? Math.max(0, size - 1 - diagonal) : Math.min(diagonal, size - 1);
 
-        while (x < n && y < n && y >= 0) {
-            char c = array[x].charAt(y);
+        while (x < size && y < size && y >= 0) {
+            char c = manuscript[x].charAt(y);
             cont[c]++;
             if (cont[c] == 4) {
                 return true;
             }
-
             x++;
-            if (isPrimary) {
+            if (principal) {
                 y++;
             } else {
                 y--;
             }
         }
         return false;
-    }
-    public static void main(String[] args) {
-//        String[] array = {"abcd", "efgh", "ijkl", "mnop"};
-//        procesarArrayDeCadenas(array);  // Salida esperada: false
-
-        String[] arrayv = {"telly", "tyllu", "hyllo",  "tyzzjujknbu", "hyllo"};
-        procesarArrayDeCadenas(arrayv);
-
-       System.out.println("-------------------------------------------------");
-       System.out.println("EJEMPLO DIAGONAL");
-        String[] arrayConDiagonal = {"RTPGQW","XDOLWE","NASWLR","REWSTL","EGSISE","BRINDR"};
-
-        procesarArrayDeCadenas(arrayConDiagonal);  // Salida esperada: true
-
     }
 }
