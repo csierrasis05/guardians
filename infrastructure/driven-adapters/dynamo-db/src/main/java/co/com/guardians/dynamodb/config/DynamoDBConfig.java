@@ -20,7 +20,7 @@ import java.net.URI;
 public class DynamoDBConfig {
 
     @Bean
-    @Profile({"local"})
+    @Profile("local")
     public DynamoDbClient amazonDynamoDBLocal(@Value("${aws.region}") String region,
                                          @Value("${aws.dynamodb.endpoint}") String endpoint) {
         return DynamoDbClient.builder()
@@ -31,7 +31,7 @@ public class DynamoDBConfig {
     }
 
     @Bean
-    @Profile({"dev", "cer", "pdn"})
+    @Profile("!local")
     public DynamoDbClient amazonDynamoDB(@Value("${aws.region}") String region) {
         return DynamoDbClient.builder()
                 .credentialsProvider(WebIdentityTokenFileCredentialsProvider.create())
