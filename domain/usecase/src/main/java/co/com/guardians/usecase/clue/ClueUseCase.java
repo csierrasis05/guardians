@@ -1,6 +1,8 @@
 package co.com.guardians.usecase.clue;
 
 import co.com.guardians.model.clue.ClueResp;
+import co.com.guardians.model.manuscriptinventory.ManuscriptInventory;
+import co.com.guardians.model.manuscriptinventory.gateways.ManuscriptInventoryGateway;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
@@ -8,17 +10,41 @@ import java.util.Arrays;
 
 @RequiredArgsConstructor
 public class ClueUseCase {
-    private final boolean trueValue = true;
-    private final boolean falseValue = false;
+    private final String trueValue = "true";
+    private final String falseValue = "false";
+
+    private final ManuscriptInventoryGateway manuscriptInventoryGateway;
 
     public ClueResp containsArtifactClue(String[] manuscript) {
+
+        String ms = String.join("", manuscript);
+        ManuscriptInventory  manus = ManuscriptInventory.builder()
+                .manuscript(ms)
+                .hiddenClue(falseValue)
+                .build();
+
+        ManuscriptInventory manuscriptInventory = manuscriptInventoryGateway.save(manus);
         if (manuscript == null || manuscript.length < 4) {
-            return ClueResp.builder().clue(falseValue).build();
+            var b = Boolean.parseBoolean(manuscriptInventory.getHiddenClue());
+            return ClueResp.builder().clue(b)
+                    .build();
         }
+
         if(validateStringArray(manuscript) || validateVertical(manuscript) || validateAllDiagonals(manuscript, manuscript.length)){
-            return ClueResp.builder().clue(trueValue).build();
+            return ClueResp.builder().clue(Boolean.parseBoolean(manuscriptInventoryGateway.save(ManuscriptInventory.builder()
+                            .manuscript(String.join("", manuscript))
+                            .hiddenClue(trueValue)
+                            .build()
+                    ).getHiddenClue()))
+                    .build();
         }
-        return ClueResp.builder().clue(falseValue).build();
+
+        return ClueResp.builder().clue(Boolean.parseBoolean(manuscriptInventoryGateway.save(ManuscriptInventory.builder()
+                        .manuscript(String.join("", manuscript))
+                        .hiddenClue(falseValue)
+                        .build()
+                ).getHiddenClue()))
+                .build();
     }
     private static boolean validateStringArray(String[] array) {
         int[] cont = new int[128]; // Asumiendo caracteres ASCII

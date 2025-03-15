@@ -1,12 +1,16 @@
 package co.com.guardians.dynamodb.config;
 
+import co.com.guardians.dynamodb.entity.ManuscriptInventoryEntity;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.WebIdentityTokenFileCredentialsProvider;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbAsyncTable;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedAsyncClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
@@ -43,9 +47,9 @@ public class DynamoDBConfig {
     }
 
 //    @Bean
-//    public DynamoDbAsyncTable<SecurityTransactionEntity> dynamoDbAsyncTable(DynamoDbEnhancedAsyncClient asyncClient,
+//    public DynamoDbAsyncTable<ManuscriptInventoryEntity> dynamoDbAsyncTable(DynamoDbEnhancedAsyncClient asyncClient,
 //                                                                            @Value("${aws.dynamodb.tableName}") String tableName) {
-//        return asyncClient.table(tableName, TableSchema.fromBean(SecurityTransactionEntity.class));
+//        return asyncClient.table(tableName, TableSchema.fromBean(ManuscriptInventoryEntity.class));
 //    }
 
 }
