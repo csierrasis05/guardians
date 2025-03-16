@@ -1,0 +1,38 @@
+version: '3.8'
+services:
+  #dynamodb-local:
+    #command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+    #image: "amazon/dynamodb-local:latest"
+    #image: instructure/dynamo-local-admin
+    #container_name: dynamodb-local
+    #ports:
+    #  - "8000:8000"
+    #volumes:
+    #  - "./docker/dynamodb:/home/dynamodblocal/data"
+    #working_dir: /home/dynamodblocal
+  dynamodb:
+    image: instructure/dynamo-local-admin
+    container_name: dynamodb
+    ports:
+      - "8010:8000"
+  localstack:
+    image: localstack/localstack:0.12.5
+    environment:
+      # permite varios servicios separados por comas
+      - SERVICES=s3,sqs,secretsmanager,iam,firehose
+      - DEBUG=1
+      - DEFAULT_REGION=us-east-1
+    ports:
+      # localstack usa rango de puertos
+      - "4566-4599:4566-4599"
+      - "8081:8081"    
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+#    environment:
+#      - RABBITMQ_DEFAULT_USER=myuser
+#      - RABBITMQ_DEFAULT_PASS=mypassword
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+#      - "4566:4566"
