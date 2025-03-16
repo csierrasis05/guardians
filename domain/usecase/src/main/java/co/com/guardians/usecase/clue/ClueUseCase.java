@@ -18,7 +18,7 @@ public class ClueUseCase {
             return ClueResp.builder().clue(false).build();
         }
 
-        String ms = String.join("", manuscript);
+        String ms = String.join("-", manuscript);
         ManuscriptInventory manus = ManuscriptInventory.builder()
                 .manuscript(ms)
                 .hiddenClue(falseValue)
