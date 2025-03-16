@@ -3,7 +3,6 @@ import co.com.guardians.api.clue.dto.ClueDto;
 import co.com.guardians.api.clue.dto.ClueDtoResp;
 import co.com.guardians.api.clue.mapper.ClueMapper;
 import co.com.guardians.usecase.clue.ClueUseCase;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

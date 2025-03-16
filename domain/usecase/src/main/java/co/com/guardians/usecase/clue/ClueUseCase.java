@@ -14,32 +14,28 @@ public class ClueUseCase {
     private final ManuscriptInventoryGateway manuscriptInventoryGateway;
 
     public ClueResp containsArtifactClue(String[] manuscript) {
-        if (manuscript == null || manuscript.length < 4) {
-            return ClueResp.builder().clue(false).build();
-        }
-
         String ms = String.join("-", manuscript);
-        ManuscriptInventory manus = ManuscriptInventory.builder()
-                .manuscript(ms)
-                .hiddenClue(falseValue)
-                .build();
-
-        ManuscriptInventory manuscriptInventory = manuscriptInventoryGateway.save(manus);
-
-        if(validateStringArray(manuscript) || validateVertical(manuscript) || validateAllDiagonals(manuscript, manuscript.length)) {
-            return ClueResp.builder().clue(Boolean.parseBoolean(manuscriptInventoryGateway.save(ManuscriptInventory.builder()
-                            .manuscript(ms)
-                            .hiddenClue(trueValue)
-                            .build()
-                    ).getHiddenClue()))
+        if (manuscript.length < 4) {
+            return ClueResp.builder().clue(Boolean.parseBoolean(manuscriptInventoryGateway.save(buildManuscript(ms, falseValue))
+                            .getHiddenClue()))
                     .build();
         }
 
-        return ClueResp.builder().clue(Boolean.parseBoolean(manuscriptInventoryGateway.save(ManuscriptInventory.builder()
-                        .manuscript(ms)
-                        .hiddenClue(falseValue)
-                        .build()
-                ).getHiddenClue()))
+        if(validateStringArray(manuscript) || validateVertical(manuscript) || validateAllDiagonals(manuscript, manuscript.length)) {
+            return ClueResp.builder().clue(Boolean.parseBoolean(manuscriptInventoryGateway.save(buildManuscript(ms, trueValue))
+                    .getHiddenClue()))
+                    .build();
+        }
+
+        return ClueResp.builder().clue(Boolean.parseBoolean(manuscriptInventoryGateway.save(buildManuscript(ms, falseValue))
+                        .getHiddenClue()))
+                .build();
+    }
+
+    private ManuscriptInventory buildManuscript(String ms, String hiddenClue) {
+        return ManuscriptInventory.builder()
+                .manuscript(ms)
+                .hiddenClue(hiddenClue)
                 .build();
     }
 

@@ -34,6 +34,7 @@ public class DynamoDBConfig {
     @Profile("!local")
     public DynamoDbClient amazonDynamoDB(@Value("${aws.region}") String region) {
         return DynamoDbClient.builder()
+//                .credentialsProvider(ProfileCredentialsProvider.create("default"))
                 .credentialsProvider(WebIdentityTokenFileCredentialsProvider.create())
                 .region(Region.of(region))
                 .build();
@@ -45,11 +46,5 @@ public class DynamoDBConfig {
                 .dynamoDbClient(client)
                 .build();
     }
-
-//    @Bean
-//    public DynamoDbAsyncTable<ManuscriptInventoryEntity> dynamoDbAsyncTable(DynamoDbEnhancedAsyncClient asyncClient,
-//                                                                            @Value("${aws.dynamodb.tableName}") String tableName) {
-//        return asyncClient.table(tableName, TableSchema.fromBean(ManuscriptInventoryEntity.class));
-//    }
 
 }
