@@ -1,6 +1,6 @@
-FROM adoptopenjdk/openjdk8-openj9:alpine-slim
-VOLUME /tmp
-COPY *.jar app.jar
-RUN sh -c 'touch /app.jar'
-ENV JAVA_OPTS=" -Xshareclasses:name=cacheapp,cacheDir=/cache,nonfatal -XX:+UseContainerSupport -XX:MaxRAMPercentage=70 -Djava.security.egd=file:/dev/./urandom"
-ENTRYPOINT [ "sh", "-c", "java $JAVA_OPTS  -jar app.jar" ]
+FROM amazoncorretto:17
+WORKDIR /app
+COPY applications/app-service/build/libs/guardians.jar guardians.jar
+ENV JAVA_OPTS="-Xmx512m -Xms256m"
+
+CMD ["sh", "-c", "java $JAVA_OPTS -jar guardians.jar"]

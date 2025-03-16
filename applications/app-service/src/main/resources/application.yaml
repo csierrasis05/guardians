@@ -24,6 +24,9 @@ cors:
   allowed-origins: "http://localhost:4200,http://localhost:8080"
 aws:
   dynamodb:
+#    endpoint: "https://dynamodb.us-east-1.amazonaws.com"
     endpoint: "${AWS_DYNAMODB_ENDPOINT}"
-    tableName: "${TABLE_NAME}"
+    access-key: ${AWS_ACCESS_KEY_ID}
+    secret-key: ${AWS_SECRET_ACCESS_KEY}
+    tableName: "manuscriptInventory"
   region: "us-east-1"
